@@ -12,9 +12,13 @@ contract Player {
     address name = msg.sender;
     uint256 wallet;
     mapping(uint256 => BattleCard) cardsInventory;
+    BattleCard strongestCard;
+    uint256 highestStats;
 
     constructor(uint256 id, BattleCard starterCard) public {
         cardsInventory[id] = starterCard;
+        strongestCard = starterCard;
+        highestStats = starterCard.getStats();
         state = playerState.offline;
         wallet = 0;
     }
@@ -71,10 +75,26 @@ contract Player {
     function addCard(uint256 id, BattleCard newCard) public {
         require(cardsInventory[id] == BattleCard(0), "Already owned card");
         cardsInventory[id] = newCard;
+        if (newCard.getStats() > strongestCard.getStats()) {
+            strongestCard = newCard;
+            highestStats = newCard.getStats();
+        }
     }
 
     function removeCard(uint256 id) public {
         require(cardsInventory[id] != BattleCard(0), "Does not own this card");
         cardsInventory[id] = BattleCard(0);
+    }
+
+    function viewWalletAmount() public view returns (uint256) {
+        return wallet;
+    }
+
+    function viewStrongestCard() public view returns (BattleCard) {
+        return strongestCard;
+    }
+
+    function viewHighestStats() public view returns (uint256) {
+        return highestStats;
     }
 }
