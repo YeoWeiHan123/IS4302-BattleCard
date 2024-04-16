@@ -1,5 +1,6 @@
 pragma solidity ^0.5.0;
 
+import "./BattleToken.sol";
 import "./RNG.sol";
 
 contract BattleCard {
@@ -13,20 +14,32 @@ contract BattleCard {
         uint256 totalUsage;
         address[] previousOwners;
     }
-
+    
     uint256 private nextCardId = 1;
     mapping(uint256 => Card) public cards;
+
+    BattleToken battleTokenContract;
     RNG rngContract; 
 
-    constructor(RNG rngAddress) public {
-        rngContract = rngAddress; 
+    constructor(BattleToken battleTokenAddress, RNG rngAddress) public {
+        battleTokenContract = battleTokenAddress;
+        rngContract = rngAddress;
     }
 
     event CardCreated(uint256 id, uint256 damage, uint256 hp, uint256 luckMultiplier, address owner);
     event OwnershipTransferred(uint256 cardId, address from, address to);
     event CardStatsUpdated(uint256 cardId, uint256 totalWins, uint256 totalLosses, uint256 totalUsage);
 
-    function createCard() public {
+
+    function createCard(
+        uint256 btAmt
+    ) public returns (uint256) {
+        require(btAmt == 1);
+        require(
+            battleTokenContract.checkCredit(msg.sender) >= btAmt,
+            "Not enough BT"
+        );
+
         uint256 randomSeed = rngContract.generateRandonNumber();
         uint256 damage = (randomSeed % 10) + 1;
         uint256 hp = ((randomSeed / 10) % 20) + 10;
@@ -42,6 +55,7 @@ contract BattleCard {
         emit CardCreated(nextCardId, damage, hp, luckMultiplier, msg.sender);
 
         nextCardId++;
+        return newCard.id;
     }
 
     function transferOwnership(uint256 cardId, address newOwner) public {
