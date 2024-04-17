@@ -58,7 +58,7 @@ contract ERC20 {
     
     
     string public constant name = "BattleToken";
-    string public constant symbol = "DT";
+    string public constant symbol = "BT";
     uint8 public constant decimals = 18;
     uint256 totalSupply_;
   

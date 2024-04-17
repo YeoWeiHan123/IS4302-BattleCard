@@ -14,8 +14,8 @@ contract Battle {
 
     event buyCredit(uint256 btAmt); //event of minting of BT to the msg.sender
     event returnCredits(uint256 btAmt); //event of returning of BT of the msg.sender
-    event battleWin(address winner, address loser); //event of the roll resulting in winners
-    event battleDraw(address ad1, address ad2); //event of the roll resulting in a draw
+    event battleWin(address winner, address loser); //event of the battle resulting in winners
+    event battleDraw(address ad1, address ad2); //event of the battle resulting in a draw
 
     /**
    * @dev Takes in Eth from the msg.sender and gives him BattleToken in return
@@ -35,13 +35,9 @@ contract Battle {
     }
 
     /**
-    * @dev Function to return the BT to the casino and get ether back at the conversion rate of 0.009 Eth per BT
+    * @dev Function to return the BT to the Battle and get ether back at the conversion rate of 0.009 Eth per BT
     */
     function returnBT() public  {
-        // Hint 1: in recipient.transfer(amt), the amt is in wei,
-        //         which you can convert from eth at: 1eth = 1000000000000000000 wei
-        // Hint 2: Contracts address can be accessed with address(this)
-        // Hint 3: You can just transfer the BT back to this contracts address, there is no need to burn the BT
         uint256 btAmt = battleTokenContract.checkCredit(msg.sender);
         battleTokenContract.transferCredit(address(this), btAmt);
 
