@@ -40,4 +40,19 @@ contract("Battle", function (accounts) {
         await assert(amt1.isEqualTo(correctAmt1), "Incorrect BT given");
         await assert(amt2.isEqualTo(correctAmt2), "Incorrect BT given");
     });
+
+    it ("Get BattleCard", async () => {
+        // Store intial BT of account 1
+        const account1BT = new BigNumber(await battleInstance.checkBT({ from: accounts[1] }));
+
+        // Create card by spending 1 BT
+        await battleCardInstance.createCard({ from: accounts[1] });
+
+        // Store the new BT balance
+        const newAccount1BT = new BigNumber(
+            await battleInstance.checkBT({ from: accounts[1] })
+        );
+        // Check if the new balance is 1BT lower than original
+        await assert(newAccount1BT.isEqualTo(account1BT.minus(1)), "BT not subtracted");
+    });
 });
