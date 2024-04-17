@@ -1,6 +1,7 @@
 const _deploy_contracts = require("../migrations/2_deploy_contracts");
 const truffleAssert = require("truffle-assertions"); // npm truffle-assertions
 const BigNumber = require("bignumber.js"); // npm install bignumber.js
+const Web3 = require('web3'); // npm install web3
 var assert = require("assert");
 
 var BattleToken = artifacts.require("../contracts/BattleToken.sol");
@@ -39,6 +40,44 @@ contract("Battle", function (accounts) {
 
         await assert(amt1.isEqualTo(correctAmt1), "Incorrect BT given");
         await assert(amt2.isEqualTo(correctAmt2), "Incorrect BT given");
+    });
+
+    it("Return BattleToken", async () => {
+        await battleInstance.getBT({
+            from: accounts[3],
+            value: oneEth.multipliedBy(10),
+        });
+        // Store the initial Account balances for account 3 and Battle Contract
+        let intialAccountBal = new BigNumber(await web3.eth.getBalance(accounts[3]));
+        let intialBattleBal = new BigNumber(
+            await web3.eth.getBalance(battleInstance.address)
+        );
+        let intialBattleBTBal = new BigNumber(
+            await battleTokenInstance.checkCredit(battleInstance.address)
+        );
+
+        // 1000 BT and (9 out of 10) Eth should be returned to the account 3
+        await battleInstance.returnBT({ from: accounts[3] });
+        let newAccountBal = new BigNumber(await web3.eth.getBalance(accounts[3]));
+
+        // Check that 1000 BT is returned
+        let newBattleBTBal = new BigNumber(
+            await battleTokenInstance.checkCredit(battleInstance.address)
+        );
+        await assert(
+            newBattleBTBal.isEqualTo(intialBattleBTBal.plus(1000)),
+            "BT was not returned to Contract"
+        );
+        // Check that the new account has greater ETH
+        await assert(newAccountBal.isGreaterThan(intialAccountBal), "Incorrect Return Amt");
+
+        // Battle Contract should have 1 eth left out of the 10 eth, losing 9 eth in the process
+        let newBattleBal = new BigNumber(await web3.eth.getBalance(battleInstance.address));
+        let battleBalIncr = intialBattleBal.minus(newBattleBal);
+        await assert(
+            battleBalIncr.isEqualTo(oneEth.multipliedBy(9)),
+            "Battle was not given the correct amount of ETH"
+        );
     });
 
     it ("Get BattleCard", async () => {
