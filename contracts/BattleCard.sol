@@ -42,6 +42,12 @@ contract BattleCard {
         address owner
     );
     event OwnershipTransferred(uint256 cardId, address from, address to);
+    event CardsTraded(
+        uint256 givingCard,
+        uint256 receivingCard,
+        address me,
+        address other
+    );
     event CardStatsUpdated(
         uint256 cardId,
         uint256 totalWins,
@@ -103,6 +109,28 @@ contract BattleCard {
         card.previousOwners.push(newOwner);
 
         emit OwnershipTransferred(cardId, msg.sender, newOwner);
+    }
+
+    function tradeCards(
+        uint256 myCardId,
+        uint256 theirCardId,
+        address newOwner
+    ) public ownerOnly(myCardId) validCardId(myCardId) {
+        require(isOwner(msg.sender, myCardId), "Trader must own the card");
+        require(
+            isOwner(newOwner, theirCardId),
+            "Other party must own their card"
+        );
+
+        // add new owner to my card
+        Card storage transferringOutCard = cards[myCardId];
+        transferringOutCard.previousOwners.push(newOwner);
+
+        // add myself as owner to the other card
+        Card storage receivingCard = cards[theirCardId];
+        receivingCard.previousOwners.push(msg.sender);
+
+        emit CardsTraded(myCardId, theirCardId, msg.sender, newOwner);
     }
 
     function getOwner(uint256 cardId) public view returns (address) {

@@ -17,17 +17,28 @@ contract BattleMarket {
     uint256 public listingCount;
 
     event CardListed(uint256 cardId, uint256 price, address seller);
-    event CardPurchased(uint256 cardId, address buyer, address seller, uint256 price);
+    event CardPurchased(
+        uint256 cardId,
+        address buyer,
+        address seller,
+        uint256 price
+    );
     event CardWithdrawn(uint256 cardId, address owner);
 
-    constructor(BattleCard _battleCardContract, BattleToken _battleTokenContract) public {
+    constructor(
+        BattleCard _battleCardContract,
+        BattleToken _battleTokenContract
+    ) public {
         battleCardContract = _battleCardContract;
         battleTokenContract = _battleTokenContract;
     }
 
     // Player calls this function to list a card for sale
     function listCard(uint256 cardId, uint256 price) public {
-        require(battleCardContract.getOwner(cardId) == msg.sender, "You must own the card to list it");
+        require(
+            battleCardContract.getOwner(cardId) == msg.sender,
+            "You must own the card to list it"
+        );
         require(listings[cardId].cardId == 0, "Card is already listed");
 
         battleCardContract.transferOwnership(cardId, address(this));
@@ -56,7 +67,10 @@ contract BattleMarket {
 
     // Player calls this function to withdraw a listed card
     function withdrawCard(uint256 cardId) public {
-        require(listings[cardId].seller == msg.sender, "You must be the seller to withdraw the card");
+        require(
+            listings[cardId].seller == msg.sender,
+            "You must be the seller to withdraw the card"
+        );
 
         battleCardContract.transferOwnership(cardId, msg.sender);
         delete listings[cardId];

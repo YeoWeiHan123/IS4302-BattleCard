@@ -195,4 +195,37 @@ contract("BattleLedger", function (accounts) {
       "BT not added for winning battle"
     );
   });
+
+  it("List Card on Marketplace", async () => {
+    await battleLedgerInstance.getBT({
+      from: accounts[5],
+      value: oneEth,
+    });
+
+    // create card from account 5
+    let listedCardId = await battleCardInstance.createCard({
+      from: accounts[5],
+    });
+    // console.log("listed card id is: ", listedCardId);
+
+    let t1 = await battleCardInstance.transferOwnership(
+      2,
+      battleGroundInstance.address,
+      { from: accounts[5] }
+    );
+
+    // list card from account 1
+    // let cardListed = await battleMarketInstance.listCard(2, 5, {
+    //   from: accounts[5],
+    // });
+
+    // truffleAssert.eventEmitted(cardListed, "CardListed");
+  });
+
+  //   it("Trade Cards", async () => {
+  //     // create card from account 1
+  //     const newCardId = await battleCardInstance.createCard({
+  //       from: accounts[1],
+  //     });
+  //   });
 });
