@@ -3,7 +3,7 @@ pragma solidity ^0.5.0;
 import "./BattleCard.sol";
 import "./BattleToken.sol";
 
-contract Battle {
+contract BattleLedger {
     BattleCard battleCardContract;
     BattleToken battleTokenContract;
 
@@ -35,7 +35,7 @@ contract Battle {
     }
 
     /**
-    * @dev Function to return the BT to the Battle and get ether back at the conversion rate of 0.009 Eth per BT
+    * @dev Function to return the BT to the BattleLedger and get ether back at the conversion rate of 0.009 Eth per BT
     */
     function returnBT() public  {
         uint256 btAmt = battleTokenContract.checkCredit(msg.sender);

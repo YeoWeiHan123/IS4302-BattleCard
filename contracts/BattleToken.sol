@@ -21,7 +21,7 @@ contract BattleToken {
         public
         returns (uint256)
     {
-        uint256 amt = weiAmt / (1000000000000000000/100); // Convert weiAmt to Battle Token
+        uint256 amt = weiAmt / (1000000000000000000/100); // Convert weiAmt to BattleLedger Token
         erc20Contract.mint(recipient, amt);
         return amt;
     }
