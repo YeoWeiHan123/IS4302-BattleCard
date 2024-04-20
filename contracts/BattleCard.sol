@@ -30,10 +30,10 @@ contract BattleCard {
     event OwnershipTransferred(uint256 cardId, address from, address to);
     event CardStatsUpdated(uint256 cardId, uint256 totalWins, uint256 totalLosses, uint256 totalUsage);
 
-    // create a card with random stats, costs 1 BT
+    // create a card with random stats, costs 10 BT
     function createCard() public returns (uint256) {
         require(
-            battleTokenContract.checkCredit(msg.sender) >= 1,
+            battleTokenContract.checkCredit(msg.sender) >= 10,
             "Not enough BT"
         );
 
@@ -53,7 +53,7 @@ contract BattleCard {
 
         nextCardId++;
 
-        battleTokenContract.transferCredit(address(this), 1); // deduct 1 BT from the player
+        battleTokenContract.transferCredit(address(this), 10); // deduct 10 BT from the player
         return newCard.id;
     }
 

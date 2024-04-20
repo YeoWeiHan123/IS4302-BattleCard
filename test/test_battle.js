@@ -92,6 +92,6 @@ contract("BattleLedger", function (accounts) {
             await battleLedgerInstance.checkBT({ from: accounts[1] })
         );
         // Check if the new balance is 1BT lower than original
-        await assert(newAccount1BT.isEqualTo(account1BT.minus(1)), "BT not subtracted");
+        await assert(newAccount1BT.isEqualTo(account1BT.minus(10)), "BT not subtracted");
     });
 });
