@@ -90,7 +90,6 @@ contract BattleCard {
         return newCardId;
     }
 
-    function transferOwnership(uint256 cardId, address newOwner) public {
     function transferOwnership(
         uint256 cardId,
         address newOwner
@@ -127,7 +126,6 @@ contract BattleCard {
         return cards[cardId].previousOwners;
     }
 
-    function isOwner(address owner, uint256 cardId) public view returns (bool) {
     function isOwner(
         address owner,
         uint256 cardId
@@ -183,7 +181,7 @@ contract BattleCard {
         return cards[cardId].luckMultiplier;
     }
 
-    function getCardState (uint256 cardId) public view returns (cardState) {
+    function getCardState(uint256 cardId) public view returns (cardState) {
         return cards[cardId].state;
     }
 
