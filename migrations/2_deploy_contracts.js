@@ -2,6 +2,7 @@ const ERC20 = artifacts.require("ERC20");
 const RNG = artifacts.require("RNG");
 const BattleToken = artifacts.require("BattleToken");
 const BattleCard = artifacts.require("BattleCard");
+const BattleGround = artifacts.require("BattleGround");
 const BattleMarket = artifacts.require("BattleMarket");
 const BattleLedger = artifacts.require("BattleLedger");
 
@@ -16,6 +17,9 @@ module.exports = (deployer, network, accounts) => {
         })
         .then(function () {
             return deployer.deploy(BattleCard, BattleToken.address, RNG.address);
+        })
+        .then(function () {
+            return deployer.deploy(BattleGround, BattleCard.address, BattleToken.address);
         })
         .then(function () {
             return deployer.deploy(BattleMarket, BattleCard.address, BattleToken.address);
