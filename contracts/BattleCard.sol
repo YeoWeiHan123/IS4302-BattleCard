@@ -76,7 +76,7 @@ contract BattleCard {
             "Not enough BT"
         );
 
-        uint256 randomSeed = rngContract.generateRandonNumber();
+        uint256 randomSeed = rngContract.generateRandomNumber();
 
         uint256 damage = randomSeed;
         uint256 hp = randomSeed;

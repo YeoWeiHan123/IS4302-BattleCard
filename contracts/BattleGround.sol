@@ -2,8 +2,11 @@ pragma solidity ^0.5.0;
 
 import "./BattleCard.sol";
 import "./BattleToken.sol";
+import "./ERC20.sol";
 
 contract BattleGround {
+    using SafeMath for uint256;
+
     BattleCard battleCardContract;
     BattleToken battleTokenContract;
 
@@ -46,9 +49,10 @@ contract BattleGround {
 
         uint256 myCardHealth = battleCardContract.getHp(myCardId);
         uint256 enemyCardHealth = battleCardContract.getHp(enemyCardId);
+        
         while (myCardHealth > 0 && enemyCardHealth > 0) {
-            myCardHealth -= enemyCardDamage;
-            enemyCardHealth -= myCardDamage;
+            myCardHealth = myCardHealth > enemyCardDamage ? myCardHealth.sub(enemyCardDamage) : 0;
+            enemyCardHealth = enemyCardHealth > myCardDamage ? enemyCardHealth.sub(myCardDamage) : 0;
         }
 
         battleCardContract.incrementUsage(myCardId);
