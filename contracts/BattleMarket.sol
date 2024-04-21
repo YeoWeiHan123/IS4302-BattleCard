@@ -78,4 +78,19 @@ contract BattleMarket {
 
         emit CardWithdrawn(cardId, msg.sender);
     }
+
+    function buyNewCard() public returns (uint256) {
+        require(battleTokenContract.checkCredit(msg.sender) >= 10, "Not enough BT");
+
+        // Transfer 10 BT from the buyer to the BattleMarket contract
+        battleTokenContract.transferCredit(address(this), 10);
+
+        // Create a new card and get its ID
+        uint256 newCardId = battleCardContract.createCard();
+
+        // Transfer ownership of the new card to the buyer
+        // battleCardContract.transferOwnership(newCardId, msg.sender);
+
+        return newCardId;
+    }
 }

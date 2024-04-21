@@ -279,4 +279,50 @@ contract("BattleLedger", function (accounts) {
       "Ownership not correctly transferred"
     );
   });
+
+  it("Buy a new card from the BattleMarket", async () => {
+    // Give account[1] some BattleTokens
+    await battleLedgerInstance.getBT({
+      from: accounts[1],
+      value: oneEth.multipliedBy(2), // 2 ETH = 200 BT
+    });
+
+    // Get the initial BT balance of account[1]
+    const initialBTBalance = new BigNumber(
+      await battleTokenInstance.checkCredit(accounts[1])
+    );
+
+    // Buy a new card from the BattleMarket
+    const tx = await battleMarketInstance.buyNewCard({ from: accounts[1] });
+
+    // Get the event data from the transaction receipt
+    const receipt = await web3.eth.getTransactionReceipt(tx.tx);
+    const newCardId = receipt.logs[0].args.newCardId;
+
+    // Transfer ownership of the new card to account[1]
+    await battleCardInstance.transferOwnership(newCardId, accounts[1], { from: accounts[1] });
+
+    // Get the new BT balance of account[1]
+    const newBTBalance = new BigNumber(
+      await battleTokenInstance.checkCredit(accounts[1])
+    );
+
+    // Check if the BT balance was reduced by 10
+    assert.strictEqual(
+      newBTBalance.toNumber(),
+      initialBTBalance.minus(10).toNumber(),
+      "BT balance was not reduced by 10"
+    );
+
+    // Check if the new card was created
+    assert.notStrictEqual(newCardId, undefined, "New card was not created");
+
+    // Check if the new card's owner is account[1]
+    const newCardOwner = await battleCardInstance.getOwner(newCardId);
+    assert.strictEqual(
+      newCardOwner,
+      accounts[1],
+      "The new card's owner is not account[1]"
+    );
+  });
 });
