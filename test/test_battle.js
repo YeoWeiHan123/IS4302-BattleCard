@@ -134,13 +134,6 @@ contract("BattleLedger", function (accounts) {
     truffleAssert.eventEmitted(t1, "OwnershipTransferred");
     truffleAssert.eventEmitted(t2, "OwnershipTransferred");
 
-    const account1BT = new BigNumber(
-      await battleLedgerInstance.checkBT({ from: accounts[1] })
-    );
-    const account2BT = new BigNumber(
-      await battleLedgerInstance.checkBT({ from: accounts[2] })
-    );
-
     let enemy_adj1 = await battleGroundInstance.setBattlePair(accounts[2], 0, {
       from: accounts[1],
     });
@@ -150,22 +143,6 @@ contract("BattleLedger", function (accounts) {
 
     truffleAssert.eventEmitted(enemy_adj1, "add_enemy");
     truffleAssert.eventEmitted(enemy_adj2, "add_enemy");
-
-    const newAccount1BT = new BigNumber(
-      await battleLedgerInstance.checkBT({ from: accounts[1] })
-    );
-    const newAccount2BT = new BigNumber(
-      await battleLedgerInstance.checkBT({ from: accounts[2] })
-    );
-
-    await assert(
-      newAccount1BT.isEqualTo(account1BT.minus(5)),
-      "BT not subtracted for setting battle pair"
-    );
-    await assert(
-      newAccount2BT.isEqualTo(account2BT.minus(5)),
-      "BT not subtracted for setting battle pair"
-    );
   });
 
   it("Do battle", async () => {
@@ -178,7 +155,7 @@ contract("BattleLedger", function (accounts) {
     );
 
     // Do battle
-    let doBattle = await battleGroundInstance.battle({ from: accounts[1] });
+    let doBattle = await battleGroundInstance.battle({ from: accounts[2] });
 
     // Store the new BT balance
     const newAccount1BT = new BigNumber(
@@ -188,10 +165,9 @@ contract("BattleLedger", function (accounts) {
       await battleLedgerInstance.checkBT({ from: accounts[2] })
     );
 
-    // Check if the new balance is 10 BT more than original
-    // Not sure why Card 0 loses to Card 1, but that's what happens?
+    // Check if the new balance is 5 BT more than original
     await assert(
-      newAccount2BT.isEqualTo(account2BT.plus(10)),
+      newAccount1BT.isEqualTo(account1BT.plus(5)),
       "BT not added for winning battle"
     );
   });

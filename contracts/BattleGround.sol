@@ -22,19 +22,17 @@ contract BattleGround {
     event battleDraw(uint256 id1, uint256 id2);
 
     function setBattlePair(address enemy, uint myCardId) public {
-        require(battleCardContract.getPrevOwner(myCardId) == tx.origin, "Not owner of this card!");
+        require(battleCardContract.getPrevOwner(myCardId) == msg.sender, "Not owner of this card!");
         require(battleCardContract.getPrevOwner(myCardId) != enemy, "Cannot battle yourself!");
-        battle_pair[tx.origin] = enemy;
-        battle_card_id_used[tx.origin] = myCardId;
-
-        battleTokenContract.transferCredit(address(this), 5);
+        battle_pair[msg.sender] = enemy;
+        battle_card_id_used[msg.sender] = myCardId;
 
         emit add_enemy(enemy, myCardId);
     }
 
     function battle() public {
         // Require that battle_pairs align, ie each player has accepted a battle with the other
-        address mine = tx.origin;
+        address mine = msg.sender;
         address enemy = battle_pair[mine];
         
         require(battle_pair[mine] == enemy, "Not valid pair!");
@@ -61,18 +59,18 @@ contract BattleGround {
         if (myCardHealth > 0) {
             battleCardContract.incrementWins(myCardId);
             battleCardContract.incrementLosses(enemyCardId);
-            battleTokenContract.transferCredit(battleCardContract.getPrevOwner(myCardId), 10);
+
+            battleTokenContract.transferCredit(mine, 5);
 
             emit battlewin(myCardId, enemyCardId);
         } else if (enemyCardHealth > 0) {
             battleCardContract.incrementWins(enemyCardId);
             battleCardContract.incrementLosses(myCardId);
-            battleTokenContract.transferCredit(battleCardContract.getPrevOwner(enemyCardId), 10);
+
+            battleTokenContract.transferCredit(enemy, 5);
 
             emit battlewin(enemyCardId, myCardId);
         } else {
-            battleTokenContract.transferCredit(battleCardContract.getPrevOwner(myCardId), 5);
-            battleTokenContract.transferCredit(battleCardContract.getPrevOwner(enemyCardId), 5);
             
             emit battleDraw(myCardId, enemyCardId);
         }
