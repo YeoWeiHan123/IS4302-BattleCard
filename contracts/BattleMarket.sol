@@ -41,7 +41,7 @@ contract BattleMarket {
         );
         require(listings[cardId].cardId == 0, "Card is already listed");
 
-        battleCardContract.transferOwnership(cardId, address(this));
+        // battleCardContract.transferOwnership(cardId, address(this));
 
         listings[cardId] = CardListing(cardId, price, msg.sender);
         listingCount++;
@@ -58,7 +58,7 @@ contract BattleMarket {
 
         battleTokenContract.transferCredit(seller, price);
 
-        battleCardContract.transferOwnership(cardId, msg.sender);
+        // battleCardContract.transferOwnership(cardId, msg.sender);
         delete listings[cardId];
         listingCount--;
 
@@ -72,7 +72,7 @@ contract BattleMarket {
             "You must be the seller to withdraw the card"
         );
 
-        battleCardContract.transferOwnership(cardId, msg.sender);
+        // battleCardContract.transferOwnership(cardId, msg.sender);
         delete listings[cardId];
         listingCount--;
 

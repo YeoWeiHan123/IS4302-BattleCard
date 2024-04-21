@@ -197,35 +197,86 @@ contract("BattleLedger", function (accounts) {
   });
 
   it("List Card on Marketplace", async () => {
+    // give account 5 some BT
     await battleLedgerInstance.getBT({
       from: accounts[5],
       value: oneEth,
     });
 
     // create card from account 5
-    let listedCardId = await battleCardInstance.createCard({
+    await battleCardInstance.createCard({
       from: accounts[5],
     });
-    // console.log("listed card id is: ", listedCardId);
 
-    let t1 = await battleCardInstance.transferOwnership(
+    // list card from account 5
+    let cardListed = await battleMarketInstance.listCard(2, 5, {
+      from: accounts[5],
+    });
+
+    // transfer ownership to BMinstance which will facilitate the transaction
+    // let transferOwnership = await battleCardInstance.transferOwnership(
+    //   2,
+    //   battleMarketInstance.address,
+    //   { from: accounts[5] }
+    // );
+
+    truffleAssert.eventEmitted(cardListed, "CardListed");
+    // truffleAssert.eventEmitted(transferOwnership, "OwnershipTransferred");
+  });
+
+  it("Withdraw Card From Marketplace", async () => {
+    // give account 6 some BT
+    await battleLedgerInstance.getBT({
+      from: accounts[6],
+      value: oneEth,
+    });
+
+    // transfer ownership back to account 5
+    // let transferOwnership = await battleCardInstance.transferOwnership(
+    //   2,
+    //   accounts[5],
+    //   { from: address(this) }
+    // );
+
+    // delist card from account 5
+    await battleMarketInstance.withdrawCard(2, { from: accounts[5] });
+
+    try {
+      // buy delisted card from account 6
+      await battleMarketInstance.purchaseCard(2, { from: accounts[6] });
+      assert.fail("Card was bought even though it was delisted");
+    } catch (error) {
+      console.log("Card cannot be bought after it gets delisted");
+    }
+
+    // verify owner of card remains as account 5
+    assert.strictEqual(
+      await battleCardInstance.getOwner(2),
+      accounts[5],
+      "Ownership changed somehow"
+    );
+  });
+
+  it("Purchase Card", async () => {
+    // list card again
+    let cardListed = await battleMarketInstance.listCard(2, 5, {
+      from: accounts[5],
+    });
+
+    await battleMarketInstance.purchaseCard(2, { from: accounts[6] });
+
+    // transfer ownership to account 6
+    let transferOwnership = await battleCardInstance.transferOwnership(
       2,
-      battleGroundInstance.address,
+      accounts[6],
       { from: accounts[5] }
     );
 
-    // list card from account 1
-    // let cardListed = await battleMarketInstance.listCard(2, 5, {
-    //   from: accounts[5],
-    // });
-
-    // truffleAssert.eventEmitted(cardListed, "CardListed");
+    // verify new owner of card is account[6]
+    assert.strictEqual(
+      await battleCardInstance.getOwner(2),
+      accounts[6],
+      "Ownership not correctly transferred"
+    );
   });
-
-  //   it("Trade Cards", async () => {
-  //     // create card from account 1
-  //     const newCardId = await battleCardInstance.createCard({
-  //       from: accounts[1],
-  //     });
-  //   });
 });
