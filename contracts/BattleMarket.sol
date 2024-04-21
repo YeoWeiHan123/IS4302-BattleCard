@@ -88,9 +88,6 @@ contract BattleMarket {
         // Create a new card and get its ID
         uint256 newCardId = battleCardContract.createCard();
 
-        // Transfer ownership of the new card to the buyer
-        // battleCardContract.transferOwnership(newCardId, msg.sender);
-
         return newCardId;
     }
 }
