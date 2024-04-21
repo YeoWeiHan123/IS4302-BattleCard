@@ -19,4 +19,7 @@ contract RNG {
     function generateRandomNumber() public view returns (uint256) {
         return uint256(keccak256(abi.encodePacked(block.timestamp, block.difficulty, msg.sender)));
     }
+    function setRandomNumber(uint256 forcedNumber) public {
+        fakeRandomNumber = forcedNumber;
+    }
 }
